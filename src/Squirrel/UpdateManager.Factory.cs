@@ -38,7 +38,8 @@ namespace Squirrel
             var repoUri = new Uri(repoUrl);
             var userAgent = new ProductInfoHeaderValue("Squirrel", Assembly.GetExecutingAssembly().GetName().Version.ToString());
 
-            if (repoUri.Segments.Length != 3) {
+            if (repoUri.Segments.Length != 3)
+            {
                 throw new Exception("Repo URL must be to the root URL of the repo e.g. https://github.com/myuser/myrepo");
             }
 
@@ -48,12 +49,15 @@ namespace Squirrel
 
             if (!string.IsNullOrWhiteSpace(accessToken))
                 releasesApiBuilder.Append("?access_token=").Append(accessToken);
-            
+
             Uri baseAddress;
 
-            if (repoUri.Host.EndsWith("github.com", StringComparison.OrdinalIgnoreCase)) {
+            if (repoUri.Host.EndsWith("github.com", StringComparison.OrdinalIgnoreCase))
+            {
                 baseAddress = new Uri("https://api.github.com/");
-            } else {
+            }
+            else
+            {
                 // if it's not github.com, it's probably an Enterprise server
                 // now the problem with Enterprise is that the API doesn't come prefixed
                 // it comes suffixed
@@ -64,7 +68,8 @@ namespace Squirrel
 
             // above ^^ notice the end slashes for the baseAddress, explained here: http://stackoverflow.com/a/23438417/162694
 
-            using (var client = new HttpClient() { BaseAddress = baseAddress }) {
+            using (var client = new HttpClient() { BaseAddress = baseAddress })
+            {
                 client.DefaultRequestHeaders.UserAgent.Add(userAgent);
                 var response = await client.GetAsync(releasesApiBuilder.ToString());
                 response.EnsureSuccessStatusCode();

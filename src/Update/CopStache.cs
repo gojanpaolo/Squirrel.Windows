@@ -13,10 +13,12 @@ namespace Squirrel.Update
         {
             var buf = new StringBuilder();
 
-            foreach (var line in template.Split('\n')) {
+            foreach (var line in template.Split('\n'))
+            {
                 identifiers["RandomGuid"] = (Guid.NewGuid()).ToString();
 
-                foreach (var key in identifiers.Keys) {
+                foreach (var key in identifiers.Keys)
+                {
                     buf.Replace("{{" + key + "}}", SecurityElement.Escape(identifiers[key]));
                 }
 

@@ -49,7 +49,7 @@ bool CFxHelper::IsDotNetInstalled(NetVersion required)
 
 	DWORD dwReleaseInfo = 0;
 	if (key.QueryDWORDValue(L"Release", dwReleaseInfo) != ERROR_SUCCESS ||
-		dwReleaseInfo < GetDotNetVersionReleaseNumber(required)) {
+			dwReleaseInfo < GetDotNetVersionReleaseNumber(required)) {
 		return false;
 	}
 
@@ -93,7 +93,7 @@ public:
 	DECLARE_NOT_AGGREGATABLE(CDownloadProgressCallback)
 
 	BEGIN_COM_MAP(CDownloadProgressCallback)
-		COM_INTERFACE_ENTRY(IBindStatusCallback)
+	COM_INTERFACE_ENTRY(IBindStatusCallback)
 	END_COM_MAP()
 
 	DECLARE_PROTECT_FINAL_CONSTRUCT()
@@ -109,7 +109,8 @@ public:
 		m_spProgressDialog = pd;
 	}
 
-	STDMETHOD(OnProgress)(ULONG ulProgress, ULONG ulProgressMax, ULONG /*ulStatusCode*/, LPCWSTR /*szStatusText*/)
+	STDMETHOD(OnProgress)
+	(ULONG ulProgress, ULONG ulProgressMax, ULONG /*ulStatusCode*/, LPCWSTR /*szStatusText*/)
 	{
 		if (m_spProgressDialog != nullptr) {
 			if (m_spProgressDialog->HasUserCancelled()) {
@@ -122,13 +123,20 @@ public:
 		return S_OK;
 	}
 
-	STDMETHOD(OnStartBinding)(DWORD /*dwReserved*/, IBinding *pBinding) { return E_NOTIMPL; }
-	STDMETHOD(GetPriority)(LONG *pnPriority) { return E_NOTIMPL; }
-	STDMETHOD(OnLowResource)(DWORD /*reserved*/) { return E_NOTIMPL; }
-	STDMETHOD(OnStopBinding)(HRESULT /*hresult*/, LPCWSTR /*szError*/) { return E_NOTIMPL; }
-	STDMETHOD(GetBindInfo)(DWORD *pgrfBINDF, BINDINFO *pbindInfo) { return E_NOTIMPL; }
-	STDMETHOD(OnDataAvailable)(DWORD grfBSCF, DWORD dwSize, FORMATETC * /*pformatetc*/, STGMEDIUM *pstgmed) { return E_NOTIMPL; }
-	STDMETHOD(OnObjectAvailable)(REFIID /*riid*/, IUnknown * /*punk*/) { return E_NOTIMPL; }
+	STDMETHOD(OnStartBinding)
+	(DWORD /*dwReserved*/, IBinding* pBinding) { return E_NOTIMPL; }
+	STDMETHOD(GetPriority)
+	(LONG* pnPriority) { return E_NOTIMPL; }
+	STDMETHOD(OnLowResource)
+	(DWORD /*reserved*/) { return E_NOTIMPL; }
+	STDMETHOD(OnStopBinding)
+	(HRESULT /*hresult*/, LPCWSTR /*szError*/) { return E_NOTIMPL; }
+	STDMETHOD(GetBindInfo)
+	(DWORD* pgrfBINDF, BINDINFO* pbindInfo) { return E_NOTIMPL; }
+	STDMETHOD(OnDataAvailable)
+	(DWORD grfBSCF, DWORD dwSize, FORMATETC* /*pformatetc*/, STGMEDIUM* pstgmed) { return E_NOTIMPL; }
+	STDMETHOD(OnObjectAvailable)
+	(REFIID /*riid*/, IUnknown* /*punk*/) { return E_NOTIMPL; }
 
 private:
 	CComPtr<IProgressDialog> m_spProgressDialog;
@@ -139,10 +147,15 @@ HRESULT CFxHelper::InstallDotNetFramework(NetVersion version, bool isQuiet)
 	if (!isQuiet) {
 		CTaskDialog dlg;
 		TASKDIALOG_BUTTON buttons[] = {
-			{ 1, L"Install", },
-			{ 2, L"Cancel", },
+				{
+						1,
+						L"Install",
+				},
+				{
+						2,
+						L"Cancel",
+				},
 		};
-
 
 		dlg.SetButtons(buttons, 2);
 		dlg.SetMainInstructionText(GetInstallerMainInstructionForVersion(version));
@@ -161,7 +174,9 @@ HRESULT CFxHelper::InstallDotNetFramework(NetVersion version, bool isQuiet)
 	WCHAR szFinalTempFileName[_MAX_PATH] = L"";
 	CComPtr<IBindStatusCallback> bscb;
 	CComPtr<IProgressDialog> pd;
-	SHELLEXECUTEINFO execInfo = { sizeof(execInfo), };
+	SHELLEXECUTEINFO execInfo = {
+			sizeof(execInfo),
+	};
 
 	CString url;
 	url.LoadString(GetInstallerUrlForVersion(version));
@@ -237,8 +252,7 @@ HRESULT CFxHelper::InstallDotNetFramework(NetVersion version, bool isQuiet)
 
 	if (isQuiet) {
 		execInfo.lpParameters = L"/q /norestart";
-	}
-	else {
+	} else {
 		execInfo.lpParameters = L"/passive /norestart /showrmui";
 	}
 
@@ -261,11 +275,9 @@ HRESULT CFxHelper::InstallDotNetFramework(NetVersion version, bool isQuiet)
 		// See https://msdn.microsoft.com/en-us/library/ee942965%28v=vs.110%29.aspx
 		hr = HandleRebootRequirement(isQuiet);
 		// Exit as a failure, so that setup doesn't carry on now
-	}
-	else {
+	} else {
 		hr = exitCode != 0 ? E_FAIL : S_OK;
 	}
-
 
 out:
 	if (execInfo.hProcess != NULL && execInfo.hProcess != INVALID_HANDLE_VALUE) {
@@ -338,8 +350,14 @@ HRESULT CFxHelper::HandleRebootRequirement(bool isQuiet)
 
 	CTaskDialog dlg;
 	TASKDIALOG_BUTTON buttons[] = {
-		{ 1, L"Restart Now", },
-		{ 2, L"Cancel", },
+			{
+					1,
+					L"Restart Now",
+			},
+			{
+					2,
+					L"Cancel",
+			},
 	};
 
 	dlg.SetButtons(buttons, 2);
@@ -369,7 +387,7 @@ HRESULT CFxHelper::HandleRebootRequirement(bool isQuiet)
 }
 
 //
-// Write a runonce entry to the registry to tell it to continue with 
+// Write a runonce entry to the registry to tell it to continue with
 // setup after a reboot
 //
 bool CFxHelper::WriteRunOnceEntry()
@@ -415,4 +433,3 @@ bool CFxHelper::RebootSystem()
 	// Now we have that privilege, we can ask Windows to restart
 	return ExitWindowsEx(EWX_REBOOT, 0) != 0;
 }
-

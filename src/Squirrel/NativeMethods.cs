@@ -17,11 +17,15 @@ namespace Squirrel
             //Get a handle to our own process
             IntPtr hProc = OpenProcess((ProcessAccess)0x001F0FFF, false, Process.GetCurrentProcess().Id);
 
-            try {
+            try
+            {
                 int sizeInfoReturned;
                 int queryStatus = NtQueryInformationProcess(hProc, (PROCESSINFOCLASS)0, ref pbi, pbi.Size, out sizeInfoReturned);
-            } finally {
-                if (!hProc.Equals(IntPtr.Zero)) {
+            }
+            finally
+            {
+                if (!hProc.Equals(IntPtr.Zero))
+                {
                     //Close handle and free allocated memory
                     CloseHandle(hProc);
                     hProc = IntPtr.Zero;
@@ -33,10 +37,11 @@ namespace Squirrel
 
 
         [DllImport("version.dll", SetLastError = true)]
-        [return:MarshalAs(UnmanagedType.Bool)] internal static extern bool GetFileVersionInfo(
-            string lpszFileName, 
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool GetFileVersionInfo(
+            string lpszFileName,
             int dwHandleIgnored,
-            int dwLen, 
+            int dwLen,
             [MarshalAs(UnmanagedType.LPArray)] byte[] lpData);
 
         [DllImport("version.dll", SetLastError = true)]
@@ -45,26 +50,27 @@ namespace Squirrel
             IntPtr dwHandleIgnored);
 
         [DllImport("version.dll")]
-        [return:MarshalAs(UnmanagedType.Bool)] internal static extern bool VerQueryValue(
-            byte[] pBlock, 
-            string pSubBlock, 
-            out IntPtr pValue, 
+        [return: MarshalAs(UnmanagedType.Bool)]
+        internal static extern bool VerQueryValue(
+            byte[] pBlock,
+            string pSubBlock,
+            out IntPtr pValue,
             out int len);
 
-        [DllImport("psapi.dll", SetLastError=true)]
+        [DllImport("psapi.dll", SetLastError = true)]
         internal static extern bool EnumProcesses(
             IntPtr pProcessIds, // pointer to allocated DWORD array
             int cb,
             out int pBytesReturned);
 
-        [DllImport("kernel32.dll", SetLastError=true)]
+        [DllImport("kernel32.dll", SetLastError = true)]
         internal static extern bool QueryFullProcessImageName(
-            IntPtr hProcess, 
+            IntPtr hProcess,
             [In] int justPassZeroHere,
-            [Out] StringBuilder lpImageFileName, 
+            [Out] StringBuilder lpImageFileName,
             [In] [MarshalAs(UnmanagedType.U4)] ref int nSize);
 
-        [DllImport("kernel32.dll", SetLastError=true)]
+        [DllImport("kernel32.dll", SetLastError = true)]
         internal static extern IntPtr OpenProcess(
             ProcessAccess processAccess,
             bool bInheritHandle,
@@ -73,10 +79,10 @@ namespace Squirrel
         [DllImport("kernel32.dll", SetLastError = true)]
         internal static extern bool CloseHandle(IntPtr hHandle);
 
-        [DllImport("NTDLL.DLL", SetLastError=true)]
+        [DllImport("NTDLL.DLL", SetLastError = true)]
         internal static extern int NtQueryInformationProcess(IntPtr hProcess, PROCESSINFOCLASS pic, ref PROCESS_BASIC_INFORMATION pbi, int cb, out int pSize);
 
-        [DllImport("kernel32.dll", SetLastError=true)]
+        [DllImport("kernel32.dll", SetLastError = true)]
         internal static extern UInt32 WaitForSingleObject(IntPtr hHandle, UInt32 dwMilliseconds);
 
         [DllImport("kernel32.dll", EntryPoint = "GetStdHandle")]
@@ -85,22 +91,23 @@ namespace Squirrel
         [DllImport("kernel32.dll", EntryPoint = "AllocConsole")]
         [return: MarshalAs(UnmanagedType.Bool)]
         internal static extern bool AllocConsole();
- 
+
         [DllImport("kernel32.dll")]
         internal static extern bool AttachConsole(int pid);
 
-        [DllImport("Kernel32.dll", SetLastError=true)]
+        [DllImport("Kernel32.dll", SetLastError = true)]
         internal static extern IntPtr BeginUpdateResource(string pFileName, bool bDeleteExistingResources);
 
-        [DllImport("Kernel32.dll", SetLastError=true)]
+        [DllImport("Kernel32.dll", SetLastError = true)]
         internal static extern bool UpdateResource(IntPtr handle, string pType, IntPtr pName, short language, [MarshalAs(UnmanagedType.LPArray)] byte[] pData, int dwSize);
 
-        [DllImport("Kernel32.dll", SetLastError=true)]
+        [DllImport("Kernel32.dll", SetLastError = true)]
         internal static extern bool EndUpdateResource(IntPtr handle, bool discard);
     }
 
     [Flags]
-    public enum ProcessAccess : uint {
+    public enum ProcessAccess : uint
+    {
         All = 0x001F0FFF,
         Terminate = 0x00000001,
         CreateThread = 0x00000002,
@@ -116,7 +123,8 @@ namespace Squirrel
         Synchronize = 0x00100000
     }
 
-    public enum PROCESSINFOCLASS : int {
+    public enum PROCESSINFOCLASS : int
+    {
         ProcessBasicInformation = 0, // 0, q: PROCESS_BASIC_INFORMATION, PROCESS_EXTENDED_BASIC_INFORMATION
         ProcessQuotaLimits, // qs: QUOTA_LIMITS, QUOTA_LIMITS_EX
         ProcessIoCounters, // q: IO_COUNTERS
@@ -178,7 +186,8 @@ namespace Squirrel
     };
 
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
-    public struct PROCESS_BASIC_INFORMATION {
+    public struct PROCESS_BASIC_INFORMATION
+    {
         public IntPtr ExitStatus;
         public IntPtr PebBaseAddress;
         public IntPtr AffinityMask;
@@ -186,12 +195,14 @@ namespace Squirrel
         public UIntPtr UniqueProcessId;
         public IntPtr InheritedFromUniqueProcessId;
 
-        public int Size {
+        public int Size
+        {
             get { return (int)Marshal.SizeOf(typeof(PROCESS_BASIC_INFORMATION)); }
         }
     }
 
-    public enum StandardHandles : int {
+    public enum StandardHandles : int
+    {
         STD_INPUT_HANDLE = -10,
         STD_OUTPUT_HANDLE = -11,
         STD_ERROR_HANDLE = -12,

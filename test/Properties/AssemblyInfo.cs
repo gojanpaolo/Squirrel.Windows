@@ -17,5 +17,5 @@ using Xunit;
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 [assembly: Guid("f781bbe0-d19d-41aa-a78b-c689b1943094")]
 
-[assembly: CollectionBehavior(MaxParallelThreads=1, DisableTestParallelization=true)]
+[assembly: CollectionBehavior(MaxParallelThreads = 1, DisableTestParallelization = true)]
 [assembly: AssemblyMetadata("SquirrelAwareVersion", "1")]

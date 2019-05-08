@@ -13,7 +13,8 @@ using NuGet;
 namespace Squirrel
 {
     [Flags]
-    public enum ShortcutLocation {
+    public enum ShortcutLocation
+    {
         StartMenu = 1 << 0,
         Desktop = 1 << 1,
         Startup = 1 << 2,
@@ -23,7 +24,8 @@ namespace Squirrel
         AppRoot = 1 << 3
     }
 
-    public enum UpdaterIntention {
+    public enum UpdaterIntention
+    {
         Install,
         Update
     }
@@ -144,15 +146,16 @@ namespace Squirrel
     {
         public static async Task<ReleaseEntry> UpdateApp(this IUpdateManager This, Action<int> progress = null)
         {
-            progress = progress ?? (_ => {});
+            progress = progress ?? (_ => { });
             This.Log().Info("Starting automatic update");
 
             bool ignoreDeltaUpdates = false;
 
-        retry:
+            retry:
             var updateInfo = default(UpdateInfo);
 
-            try {
+            try
+            {
                 updateInfo = await This.ErrorIfThrows(() => This.CheckForUpdate(ignoreDeltaUpdates, x => progress(x / 3)),
                     "Failed to check for updates");
 
@@ -164,11 +167,14 @@ namespace Squirrel
                     This.ApplyReleases(updateInfo, x => progress(x / 3 + 66)),
                     "Failed to apply updates");
 
-                await This.ErrorIfThrows(() => 
+                await This.ErrorIfThrows(() =>
                     This.CreateUninstallerRegistryEntry(),
                     "Failed to set up uninstaller");
-            } catch {
-                if (ignoreDeltaUpdates == false) {
+            }
+            catch
+            {
+                if (ignoreDeltaUpdates == false)
+                {
                     ignoreDeltaUpdates = true;
                     goto retry;
                 }
@@ -185,7 +191,7 @@ namespace Squirrel
         {
             This.CreateShortcutsForExecutable(Path.GetFileName(
                 Assembly.GetEntryAssembly().Location),
-                ShortcutLocation.Desktop | ShortcutLocation.StartMenu, 
+                ShortcutLocation.Desktop | ShortcutLocation.StartMenu,
                 Environment.CommandLine.Contains("squirrel-install") == false,
                 null, null);
         }

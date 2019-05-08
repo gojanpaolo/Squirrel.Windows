@@ -38,29 +38,37 @@ namespace Squirrel
                 // Download the icon and PNG => ICO it. If this doesn't work, who cares
                 var pkgPath = Path.Combine(rootAppDirectory, "packages", latest.Filename);
                 var zp = new ZipPackage(pkgPath);
-                    
+
                 var targetPng = Path.Combine(Path.GetTempPath(), Guid.NewGuid() + ".png");
                 var targetIco = Path.Combine(rootAppDirectory, "app.ico");
 
                 // NB: Sometimes the Uninstall key doesn't exist
                 using (var parentKey =
                     RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Default)
-                        .CreateSubKey("Uninstall", RegistryKeyPermissionCheck.ReadWriteSubTree)) { ; }
+                        .CreateSubKey("Uninstall", RegistryKeyPermissionCheck.ReadWriteSubTree)) {; }
 
                 var key = RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Default)
                     .CreateSubKey(uninstallRegSubKey + "\\" + applicationName, RegistryKeyPermissionCheck.ReadWriteSubTree);
 
-                if (zp.IconUrl != null && !File.Exists(targetIco)) {
-                    try {
-                        using (var wc = Utility.CreateWebClient()) { 
+                if (zp.IconUrl != null && !File.Exists(targetIco))
+                {
+                    try
+                    {
+                        using (var wc = Utility.CreateWebClient())
+                        {
                             await wc.DownloadFileTaskAsync(zp.IconUrl, targetPng);
-                            using (var fs = new FileStream(targetIco, FileMode.Create)) {
-                                if (zp.IconUrl.AbsolutePath.EndsWith("ico")) {
+                            using (var fs = new FileStream(targetIco, FileMode.Create))
+                            {
+                                if (zp.IconUrl.AbsolutePath.EndsWith("ico"))
+                                {
                                     var bytes = File.ReadAllBytes(targetPng);
                                     fs.Write(bytes, 0, bytes.Length);
-                                } else {
+                                }
+                                else
+                                {
                                     using (var bmp = (Bitmap)Image.FromFile(targetPng))
-                                    using (var ico = Icon.FromHandle(bmp.GetHicon())) {
+                                    using (var ico = Icon.FromHandle(bmp.GetHicon()))
+                                    {
                                         ico.Save(fs);
                                     }
                                 }
@@ -68,9 +76,13 @@ namespace Squirrel
                                 key.SetValue("DisplayIcon", targetIco, RegistryValueKind.String);
                             }
                         }
-                    } catch(Exception ex) {
+                    }
+                    catch (Exception ex)
+                    {
                         this.Log().InfoException("Couldn't write uninstall icon, don't care", ex);
-                    } finally {
+                    }
+                    finally
+                    {
                         File.Delete(targetPng);
                     }
                 }
@@ -93,10 +105,12 @@ namespace Squirrel
                     new { Key = "Language", Value = 0x0409 },
                 };
 
-                foreach (var kvp in stringsToWrite) {
+                foreach (var kvp in stringsToWrite)
+                {
                     key.SetValue(kvp.Key, kvp.Value, RegistryValueKind.String);
                 }
-                foreach (var kvp in dwordsToWrite) {
+                foreach (var kvp in dwordsToWrite)
+                {
                     key.SetValue(kvp.Key, kvp.Value, RegistryValueKind.DWord);
                 }
 
@@ -109,7 +123,8 @@ namespace Squirrel
                 var ourExePath = ourExe != null ? ourExe.Location : null;
 
                 UnsafeUtility.EnumerateProcesses()
-                    .Where(x => {
+                    .Where(x =>
+                    {
                         // Processes we can't query will have an empty process name, we can't kill them
                         // anyways
                         if (String.IsNullOrWhiteSpace(x.Item1)) return false;
@@ -125,10 +140,13 @@ namespace Squirrel
 
                         return true;
                     })
-                    .ForEach(x => {
-                        try {
+                    .ForEach(x =>
+                    {
+                        try
+                        {
                             this.WarnIfThrows(() => Process.GetProcessById(x.Item2).Kill());
-                        } catch {}
+                        }
+                        catch { }
                     });
             }
 

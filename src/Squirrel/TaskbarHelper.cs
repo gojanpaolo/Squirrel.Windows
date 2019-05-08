@@ -5,9 +5,9 @@ using System.Runtime.InteropServices;
 
 namespace Squirrel.Shell
 {
-    public static class TaskbarHelper 
+    public static class TaskbarHelper
     {
-        public static bool IsPinnedToTaskbar(string executablePath) 
+        public static bool IsPinnedToTaskbar(string executablePath)
         {
             var taskbarPath = Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
@@ -19,33 +19,37 @@ namespace Squirrel.Shell
                 .Any(shortcut => String.Equals(shortcut.Target, executablePath, StringComparison.OrdinalIgnoreCase));
         }
 
-        public static void PinToTaskbar(string executablePath) 
+        public static void PinToTaskbar(string executablePath)
         {
             pinUnpin(executablePath, "pin to taskbar");
 
-            if (!IsPinnedToTaskbar(executablePath)) {
+            if (!IsPinnedToTaskbar(executablePath))
+            {
                 throw new Exception("Pinning executable to taskbar failed.");
             }
         }
 
-        public static void UnpinFromTaskbar(string executablePath) 
+        public static void UnpinFromTaskbar(string executablePath)
         {
             pinUnpin(executablePath, "unpin from taskbar");
 
-            if (IsPinnedToTaskbar(executablePath)) {
+            if (IsPinnedToTaskbar(executablePath))
+            {
                 throw new Exception("Executable is still pinned to taskbar.");
             }
         }
 
-        static void pinUnpin(string executablePath, string verbToExecute) 
+        static void pinUnpin(string executablePath, string verbToExecute)
         {
-            if (!File.Exists(executablePath)) {
+            if (!File.Exists(executablePath))
+            {
                 throw new FileNotFoundException(executablePath);
             }
 
             dynamic shellApplication = Activator.CreateInstance(Type.GetTypeFromProgID("Shell.Application"));
 
-            try {
+            try
+            {
                 var path = Path.GetDirectoryName(executablePath);
                 var fileName = Path.GetFileName(executablePath);
 
@@ -54,15 +58,19 @@ namespace Squirrel.Shell
 
                 dynamic verbs = link.Verbs();
 
-                for (var i = 0; i < verbs.Count(); i++) {
+                for (var i = 0; i < verbs.Count(); i++)
+                {
                     dynamic verb = verbs.Item(i);
                     string verbName = verb.Name.Replace(@"&", String.Empty).ToLower();
 
-                    if (verbName.Equals(verbToExecute)) {
+                    if (verbName.Equals(verbToExecute))
+                    {
                         verb.DoIt();
                     }
                 }
-            } finally {
+            }
+            finally
+            {
                 Marshal.ReleaseComObject(shellApplication);
             }
         }

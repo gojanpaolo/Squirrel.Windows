@@ -69,21 +69,26 @@ namespace Squirrel
         {
             var result = new List<TSource>();
 
-            using (var e = source.GetEnumerator()) {
+            using (var e = source.GetEnumerator())
+            {
                 if (!e.MoveNext()) throw new InvalidOperationException("Source sequence doesn't contain any elements.");
 
                 var current = e.Current;
                 var resKey = keySelector(current);
                 result.Add(current);
 
-                while (e.MoveNext()) {
+                while (e.MoveNext())
+                {
                     var cur = e.Current;
                     var key = keySelector(cur);
 
                     var cmp = compare(key, resKey);
-                    if (cmp == 0) {
+                    if (cmp == 0)
+                    {
                         result.Add(cur);
-                    } else if (cmp > 0) {
+                    }
+                    else if (cmp > 0)
+                    {
                         result = new List<TSource> { cur };
                         resKey = key;
                     }
@@ -163,15 +168,20 @@ namespace Squirrel
 
         private static IEnumerable<TSource> DoHelper<TSource>(this IEnumerable<TSource> source, Action<TSource> onNext, Action<Exception> onError, Action onCompleted)
         {
-            using (var e = source.GetEnumerator()) {
-                while (true) {
+            using (var e = source.GetEnumerator())
+            {
+                while (true)
+                {
                     var current = default(TSource);
-                    try {
+                    try
+                    {
                         if (!e.MoveNext())
                             break;
 
                         current = e.Current;
-                    } catch (Exception ex) {
+                    }
+                    catch (Exception ex)
+                    {
                         onError(ex);
                         throw;
                     }
@@ -243,7 +253,8 @@ namespace Squirrel
         {
             var set = new HashSet<TKey>(comparer);
 
-            foreach (var item in source) {
+            foreach (var item in source)
+            {
                 var key = keySelector(item);
 
                 if (set.Add(key)) yield return item;

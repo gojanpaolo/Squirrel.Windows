@@ -4,7 +4,8 @@
 #include "resource.h"
 #include <sddl.h>
 
-bool directoryExists(wchar_t* path) {
+bool directoryExists(wchar_t* path)
+{
 	DWORD dwResult = GetFileAttributes(path);
 
 	if (dwResult != INVALID_FILE_ATTRIBUTES) {
@@ -21,7 +22,7 @@ bool directoryExists(wchar_t* path) {
 
 bool MachineInstaller::ShouldSilentInstall()
 {
-	// Figure out the package name from our own EXE name 
+	// Figure out the package name from our own EXE name
 	wchar_t ourFile[MAX_PATH];
 	HMODULE hMod = GetModuleHandle(NULL);
 	GetModuleFileName(hMod, ourFile, _countof(ourFile));
@@ -29,12 +30,12 @@ bool MachineInstaller::ShouldSilentInstall()
 	CString fullPath = CString(ourFile);
 	CString pkgName = CString(ourFile + fullPath.ReverseFind(L'\\'));
 	pkgName.Replace(L".exe", L"");
-	
+
 	wchar_t installFolder[MAX_PATH];
 
 	// NB: Users often get into the sitch where they install the MSI, then try to
 	// install the standalone package on top of that. In previous versions we tried
-	// to detect if the app was properly installed, but now we're taking the much 
+	// to detect if the app was properly installed, but now we're taking the much
 	// more conservative approach, that if the package dir exists in any way, we're
 	// bailing out
 

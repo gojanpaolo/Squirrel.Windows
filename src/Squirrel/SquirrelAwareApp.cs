@@ -56,8 +56,9 @@ namespace Squirrel
                 new { Key = "--squirrel-uninstall", Value = onAppUninstall ?? defaultBlock },
             }.ToDictionary(k => k.Key, v => v.Value);
 
-            if (args[0] == "--squirrel-firstrun") {
-                (onFirstRun ?? (() => {}))();
+            if (args[0] == "--squirrel-firstrun")
+            {
+                (onFirstRun ?? (() => { }))();
                 return;
             }
 
@@ -66,10 +67,13 @@ namespace Squirrel
             if (!lookup.ContainsKey(args[0])) return;
             var version = args[1].ToSemanticVersion().Version;
 
-            try {
+            try
+            {
                 lookup[args[0]](version);
                 if (!ModeDetector.InUnitTestRunner()) Environment.Exit(0);
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 LogHost.Default.ErrorException("Failed to handle Squirrel events", ex);
                 if (!ModeDetector.InUnitTestRunner()) Environment.Exit(-1);
             }

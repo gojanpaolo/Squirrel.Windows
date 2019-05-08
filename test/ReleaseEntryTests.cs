@@ -54,7 +54,8 @@ namespace Squirrel.Tests.Core
         {
             var path = IntegrationTestHelper.GetPath("fixtures", name);
 
-            using (var f = File.OpenRead(path)) {
+            using (var f = File.OpenRead(path))
+            {
                 var fixture = ReleaseEntry.GenerateFromFile(f, "dontcare");
                 Assert.Equal(size, fixture.Filesize);
                 Assert.Equal(sha1, fixture.SHA1.ToLowerInvariant());
@@ -125,9 +126,12 @@ namespace Squirrel.Tests.Core
             Assert.Equal(new SemanticVersion(new Version(major, minor, patch, revision), prerelease), fixture.Version);
             Assert.Equal(isDelta, fixture.IsDelta);
 
-            if (stagingPercentage.HasValue) {
+            if (stagingPercentage.HasValue)
+            {
                 Assert.True(Math.Abs(fixture.StagingPercentage.Value - stagingPercentage.Value) < 0.001);
-            } else {
+            }
+            else
+            {
                 Assert.Null(fixture.StagingPercentage);
             }
         }
@@ -381,10 +385,13 @@ namespace Squirrel.Tests.Core
 
         static string MockReleaseEntry(string name, float? percentage = null)
         {
-            if (percentage.HasValue) {
+            if (percentage.HasValue)
+            {
                 var ret = String.Format("94689fede03fed7ab59c24337673a27837f0c3ec  {0}  1004502 # {1:F0}%", name, percentage * 100.0f);
                 return ret;
-            } else {
+            }
+            else
+            {
                 return String.Format("94689fede03fed7ab59c24337673a27837f0c3ec  {0}  1004502", name);
             }
         }

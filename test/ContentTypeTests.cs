@@ -26,7 +26,8 @@ namespace Squirrel.Tests.Core
 
             var existingTypes = GetContentTypes(expected);
 
-            try {
+            try
+            {
                 File.Copy(inputFile, tempFile);
 
                 var actual = new XmlDocument();
@@ -37,7 +38,9 @@ namespace Squirrel.Tests.Core
                 var actualTypes = GetContentTypes(actual);
 
                 Assert.Equal(existingTypes, actualTypes);
-            } finally {
+            }
+            finally
+            {
                 File.Delete(tempFile);
             }
         }

@@ -8,7 +8,7 @@
 
 using namespace std;
 
-wchar_t* FindRootAppDir() 
+wchar_t* FindRootAppDir()
 {
 	wchar_t* ourDirectory = new wchar_t[MAX_PATH];
 
@@ -24,7 +24,7 @@ wchar_t* FindRootAppDir()
 	return ourDirectory;
 }
 
-wchar_t* FindOwnExecutableName() 
+wchar_t* FindOwnExecutableName()
 {
 	wchar_t* ourDirectory = new wchar_t[MAX_PATH];
 
@@ -40,14 +40,14 @@ wchar_t* FindOwnExecutableName()
 	return ret;
 }
 
-std::wstring FindLatestAppDir() 
+std::wstring FindLatestAppDir()
 {
 	std::wstring ourDir;
 	ourDir.assign(FindRootAppDir());
 
 	ourDir += L"\\app-*";
 
-	WIN32_FIND_DATA fileInfo = { 0 };
+	WIN32_FIND_DATA fileInfo = {0};
 	HANDLE hFile = FindFirstFile(ourDir.c_str(), &fileInfo);
 	if (hFile == INVALID_HANDLE_VALUE) {
 		return NULL;
@@ -58,7 +58,7 @@ std::wstring FindLatestAppDir()
 
 	do {
 		std::wstring appVer = fileInfo.cFileName;
-		appVer = appVer.substr(4);   // Skip 'app-'
+		appVer = appVer.substr(4); // Skip 'app-'
 		if (!(fileInfo.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
 			continue;
 		}
@@ -86,9 +86,9 @@ std::wstring FindLatestAppDir()
 }
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
-                     _In_opt_ HINSTANCE hPrevInstance,
-                     _In_ LPWSTR    lpCmdLine,
-                     _In_ int       nCmdShow)
+											_In_opt_ HINSTANCE hPrevInstance,
+											_In_ LPWSTR lpCmdLine,
+											_In_ int nCmdShow)
 {
 	std::wstring appName;
 	appName.assign(FindOwnExecutableName());
@@ -96,8 +96,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	std::wstring workingDir(FindLatestAppDir());
 	std::wstring fullPath(workingDir + L"\\" + appName);
 
-	STARTUPINFO si = { 0 };
-	PROCESS_INFORMATION pi = { 0 };
+	STARTUPINFO si = {0};
+	PROCESS_INFORMATION pi = {0};
 
 	si.cb = sizeof(si);
 	si.dwFlags = STARTF_USESHOWWINDOW;

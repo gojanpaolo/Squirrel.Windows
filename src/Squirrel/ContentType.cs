@@ -9,14 +9,17 @@ namespace Squirrel
         public static void Clean(XmlDocument doc)
         {
             var typesElement = doc.FirstChild.NextSibling;
-            if (typesElement.Name.ToLowerInvariant() != "types") {
+            if (typesElement.Name.ToLowerInvariant() != "types")
+            {
                 throw new Exception("Invalid ContentTypes file, expected root node should be 'Types'");
             }
 
             var children = typesElement.ChildNodes.OfType<XmlElement>();
 
-            foreach (var child in children) {
-                if (child.GetAttribute("Extension") == "") {
+            foreach (var child in children)
+            {
+                if (child.GetAttribute("Extension") == "")
+                {
                     typesElement.RemoveChild(child);
                 }
             }
@@ -24,7 +27,7 @@ namespace Squirrel
 
         public static void Merge(XmlDocument doc)
         {
-            var elements = new [] {
+            var elements = new[] {
                 Tuple.Create("Default", "diff", "application/octet" ),
                 Tuple.Create("Default", "bsdiff", "application/octet" ),
                 Tuple.Create("Default", "exe", "application/octet" ),
@@ -33,7 +36,8 @@ namespace Squirrel
             };
 
             var typesElement = doc.FirstChild.NextSibling;
-            if (typesElement.Name.ToLowerInvariant() != "types") {
+            if (typesElement.Name.ToLowerInvariant() != "types")
+            {
                 throw new Exception("Invalid ContentTypes file, expected root node should be 'Types'");
             }
 
@@ -44,7 +48,8 @@ namespace Squirrel
 
             var toAdd = elements
                 .Where(x => existingTypes.All(t => t.Item2 != x.Item2.ToLowerInvariant()))
-                .Select(element => {
+                .Select(element =>
+                {
                     var ret = doc.CreateElement(element.Item1, typesElement.NamespaceURI);
 
                     var ext = doc.CreateAttribute("Extension"); ext.Value = element.Item2;

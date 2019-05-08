@@ -35,7 +35,8 @@ namespace Squirrel.Tests.Core
             var fixture = new ReleasePackage(inputPackage);
             (new DirectoryInfo(sourceDir)).Exists.ShouldBeTrue();
 
-            try {
+            try
+            {
                 fixture.CreateReleasePackage(outputPackage, sourceDir);
 
                 this.Log().Info("Resulting package is at {0}", outputPackage);
@@ -50,13 +51,15 @@ namespace Squirrel.Tests.Core
                 List<IPackageFile> files = pkg.GetFiles().ToList();
                 files.ForEach(x => this.Log().Info(x.Path));
 
-                List<string> nonDesktopPaths = new[] {"sl", "winrt", "netcore", "win8", "windows8", "MonoAndroid", "MonoTouch", "MonoMac", "wp", }
+                List<string> nonDesktopPaths = new[] { "sl", "winrt", "netcore", "win8", "windows8", "MonoAndroid", "MonoTouch", "MonoMac", "wp", }
                     .Select(x => @"lib\" + x)
                     .ToList();
 
                 files.Any(x => nonDesktopPaths.Any(y => x.Path.ToLowerInvariant().Contains(y.ToLowerInvariant()))).ShouldBeFalse();
                 files.Any(x => x.Path.ToLowerInvariant().EndsWith(@".xml")).ShouldBeFalse();
-            } finally {
+            }
+            finally
+            {
                 File.Delete(outputPackage);
             }
         }
@@ -95,10 +98,12 @@ namespace Squirrel.Tests.Core
             var outputPackage = Path.GetTempFileName() + ".nupkg";
             var fixture = new ReleasePackage(inputPackage);
             var sourceDir = IntegrationTestHelper.GetPath("fixtures", "packages");
-            try {
+            try
+            {
                 fixture.CreateReleasePackage(outputPackage, sourceDir);
             }
-            finally {
+            finally
+            {
                 File.Delete(outputPackage);
             }
         }
@@ -113,7 +118,8 @@ namespace Squirrel.Tests.Core
             var fixture = new ReleasePackage(inputPackage);
             (new DirectoryInfo(sourceDir)).Exists.ShouldBeTrue();
 
-            try {
+            try
+            {
                 fixture.CreateReleasePackage(outputPackage, sourceDir);
 
                 this.Log().Info("Resulting package is at {0}", outputPackage);
@@ -132,11 +138,14 @@ namespace Squirrel.Tests.Core
                     "Squirrel.Tests.dll",
                 };
 
-                filesToLookFor.ForEach(name => {
+                filesToLookFor.ForEach(name =>
+                {
                     this.Log().Info("Looking for {0}", name);
                     pkg.GetFiles().Any(y => y.Path.ToLowerInvariant().Contains(name.ToLowerInvariant())).ShouldBeTrue();
                 });
-            } finally {
+            }
+            finally
+            {
                 File.Delete(outputPackage);
             }
         }
@@ -151,7 +160,8 @@ namespace Squirrel.Tests.Core
             var targetFile = Path.GetTempFileName();
             File.Copy(inputSpec, targetFile, true);
 
-            try {
+            try
+            {
                 var processor = new Func<string, string>(input =>
                     (new Markdown()).Transform(input));
 
@@ -159,7 +169,7 @@ namespace Squirrel.Tests.Core
                 // invulnerable to ExposedObject. Whyyyyyyyyy
                 var renderMinfo = fixture.GetType().GetMethod("renderReleaseNotesMarkdown",
                     BindingFlags.NonPublic | BindingFlags.Instance);
-                renderMinfo.Invoke(fixture, new object[] {targetFile, processor});
+                renderMinfo.Invoke(fixture, new object[] { targetFile, processor });
 
                 var doc = XDocument.Load(targetFile);
                 XNamespace ns = "http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd";
@@ -169,7 +179,9 @@ namespace Squirrel.Tests.Core
                 this.Log().Info("HTML Text:\n{0}", htmlText);
 
                 htmlText.Contains("## Release Notes").ShouldBeFalse();
-            } finally {
+            }
+            finally
+            {
                 File.Delete(targetFile);
             }
         }
@@ -187,7 +199,8 @@ namespace Squirrel.Tests.Core
             var rightPackage = "Caliburn.Micro.1.5.2.nupkg";
             var rightPackagePath = IntegrationTestHelper.GetPath("fixtures", rightPackage);
 
-            try {
+            try
+            {
                 var sourceDir = IntegrationTestHelper.GetPath("fixtures", "packages");
                 (new DirectoryInfo(sourceDir)).Exists.ShouldBeTrue();
 
@@ -214,7 +227,9 @@ namespace Squirrel.Tests.Core
                 var assemblyName = AssemblyName.GetAssemblyName(outputFile);
                 Assert.Equal(1, assemblyName.Version.Major);
                 Assert.Equal(5, assemblyName.Version.Minor);
-            } finally {
+            }
+            finally
+            {
                 File.Delete(outputPackage);
                 File.Delete(outputFile);
             }
@@ -225,16 +240,20 @@ namespace Squirrel.Tests.Core
         {
             string packagesDir;
             // use empty packages folder
-            using (Utility.WithTempDirectory(out packagesDir)) {
+            using (Utility.WithTempDirectory(out packagesDir))
+            {
                 var inputPackage = IntegrationTestHelper.GetPath("fixtures", "ProjectDependsOnJsonDotNet.1.0.nupkg");
 
                 var outputPackage = Path.GetTempFileName() + ".nupkg";
 
-                try {
+                try
+                {
                     var package = new ReleasePackage(inputPackage);
                     Assert.Throws<Exception>(() =>
                         package.CreateReleasePackage(outputPackage, packagesDir));
-                } finally {
+                }
+                finally
+                {
                     File.Delete(outputPackage);
                 }
             }
@@ -250,7 +269,8 @@ namespace Squirrel.Tests.Core
             var fixture = new ReleasePackage(inputPackage);
             (new DirectoryInfo(sourceDir)).Exists.ShouldBeTrue();
 
-            try {
+            try
+            {
                 fixture.CreateReleasePackage(outputPackage, sourceDir);
 
                 this.Log().Info("Resulting package is at {0}", outputPackage);
@@ -271,7 +291,9 @@ namespace Squirrel.Tests.Core
                 Assert.Contains("dir\\item-in-subdirectory.txt", contentFilePaths);
 
                 Assert.Equal(1, pkg.GetLibFiles().Count());
-            } finally {
+            }
+            finally
+            {
                 File.Delete(outputPackage);
             }
         }
@@ -286,7 +308,8 @@ namespace Squirrel.Tests.Core
             var rightPackage = "Caliburn.Micro.1.5.2.nupkg";
             var rightPackagePath = IntegrationTestHelper.GetPath("fixtures", rightPackage);
 
-            try {
+            try
+            {
                 var sourceDir = IntegrationTestHelper.GetPath("fixtures", "packages");
                 (new DirectoryInfo(sourceDir)).Exists.ShouldBeTrue();
 
@@ -302,7 +325,9 @@ namespace Squirrel.Tests.Core
                     .FirstOrDefault(f => f.TargetFramework == FrameworkTargetVersion.Net45);
 
                 Assert.NotNull(dependency);
-            } finally {
+            }
+            finally
+            {
                 File.Delete(outputPackage);
             }
         }

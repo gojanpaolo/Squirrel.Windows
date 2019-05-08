@@ -20,7 +20,8 @@ namespace Squirrel.Tests.Core
             var expectedPackageFile = IntegrationTestHelper.GetPath("fixtures", "Squirrel.Core.1.1.0.0-full.nupkg");
             var outFile = Path.GetTempFileName() + ".nupkg";
 
-            try {
+            try
+            {
                 var deltaBuilder = new DeltaPackageBuilder();
                 deltaBuilder.ApplyDeltaPackage(basePackage, deltaPackage, outFile);
 
@@ -41,8 +42,11 @@ namespace Squirrel.Tests.Core
                 Enumerable.Zip(expectedList, actualList, (e, a) => e == a)
                     .All(x => x != false)
                     .ShouldBeTrue();
-            } finally {
-                if (File.Exists(outFile)) {
+            }
+            finally
+            {
+                if (File.Exists(outFile))
+                {
                     File.Delete(outFile);
                 }
             }
@@ -55,7 +59,8 @@ namespace Squirrel.Tests.Core
             var deltaPackage = new ReleasePackage(IntegrationTestHelper.GetPath("fixtures", "slack-1.2.0-delta.nupkg"));
             var outFile = Path.GetTempFileName() + ".nupkg";
 
-            try {
+            try
+            {
                 var deltaBuilder = new DeltaPackageBuilder();
                 deltaBuilder.ApplyDeltaPackage(basePackage, deltaPackage, outFile);
 
@@ -63,8 +68,11 @@ namespace Squirrel.Tests.Core
 
                 result.Id.ShouldEqual("slack");
                 result.Version.ShouldEqual(new SemanticVersion("1.2.0"));
-            } finally {
-                if (File.Exists(outFile)) {
+            }
+            finally
+            {
+                if (File.Exists(outFile))
+                {
                     File.Delete(outFile);
                 }
             }
@@ -95,7 +103,8 @@ namespace Squirrel.Tests.Core
                 .Select(_ => Path.GetTempPath() + Guid.NewGuid().ToString() + ".nupkg")
                 .ToArray();
 
-            try {
+            try
+            {
                 baseFixture.CreateReleasePackage(tempFiles[0], sourceDir);
                 fixture.CreateReleasePackage(tempFiles[1], sourceDir);
 
@@ -154,12 +163,15 @@ namespace Squirrel.Tests.Core
                 deltaPkg.GetFiles().Any(x => x.Path.ToLowerInvariant().EndsWith(".diff")).ShouldBeTrue();
                 deltaPkg.GetFiles()
                     .Where(x => x.Path.ToLowerInvariant().EndsWith(".diff"))
-                    .ForEach(x => {
+                    .ForEach(x =>
+                    {
                         var lookingFor = x.Path.Replace(".diff", ".shasum");
                         this.Log().Info("Looking for corresponding shasum file: {0}", lookingFor);
                         deltaPkg.GetFiles().Any(y => y.Path == lookingFor).ShouldBeTrue();
                     });
-            } finally {
+            }
+            finally
+            {
                 tempFiles.ForEach(File.Delete);
             }
         }
@@ -180,7 +192,8 @@ namespace Squirrel.Tests.Core
                 .Select(_ => Path.GetTempPath() + Guid.NewGuid().ToString() + ".nupkg")
                 .ToArray();
 
-            try {
+            try
+            {
                 baseFixture.CreateReleasePackage(tempFiles[0], sourceDir);
                 fixture.CreateReleasePackage(tempFiles[1], sourceDir);
 
@@ -192,7 +205,9 @@ namespace Squirrel.Tests.Core
                     var deltaBuilder = new DeltaPackageBuilder();
                     deltaBuilder.CreateDeltaPackage(baseFixture, fixture, tempFiles[2]);
                 });
-            } finally {
+            }
+            finally
+            {
                 tempFiles.ForEach(File.Delete);
             }
         }
@@ -211,12 +226,16 @@ namespace Squirrel.Tests.Core
 
             var tempFile = Path.GetTempPath() + Guid.NewGuid() + ".nupkg";
 
-            try {
-                Assert.Throws<ArgumentException>(() => {
+            try
+            {
+                Assert.Throws<ArgumentException>(() =>
+                {
                     var deltaBuilder = new DeltaPackageBuilder();
                     deltaBuilder.CreateDeltaPackage(baseFixture, fixture, tempFile);
                 });
-            } finally {
+            }
+            finally
+            {
                 File.Delete(tempFile);
             }
         }
@@ -237,7 +256,8 @@ namespace Squirrel.Tests.Core
                 .Select(_ => Path.GetTempPath() + Guid.NewGuid().ToString() + ".nupkg")
                 .ToArray();
 
-            try {
+            try
+            {
                 baseFixture.CreateReleasePackage(tempFiles[0], sourceDir);
                 fixture.CreateReleasePackage(tempFiles[1], sourceDir);
 
@@ -247,11 +267,14 @@ namespace Squirrel.Tests.Core
                 // NOW WATCH AS THE FILE DISAPPEARS
                 File.Delete(baseFixture.ReleasePackageFile);
 
-                Assert.Throws<FileNotFoundException>(() => {
+                Assert.Throws<FileNotFoundException>(() =>
+                {
                     var deltaBuilder = new DeltaPackageBuilder();
                     deltaBuilder.CreateDeltaPackage(baseFixture, fixture, tempFiles[2]);
                 });
-            } finally {
+            }
+            finally
+            {
                 tempFiles.ForEach(File.Delete);
             }
         }
@@ -272,7 +295,8 @@ namespace Squirrel.Tests.Core
                 .Select(_ => Path.GetTempPath() + Guid.NewGuid().ToString() + ".nupkg")
                 .ToArray();
 
-            try {
+            try
+            {
                 baseFixture.CreateReleasePackage(tempFiles[0], sourceDir);
                 fixture.CreateReleasePackage(tempFiles[1], sourceDir);
 
@@ -282,11 +306,14 @@ namespace Squirrel.Tests.Core
                 // NOW WATCH AS THE FILE DISAPPEARS
                 File.Delete(fixture.ReleasePackageFile);
 
-                Assert.Throws<FileNotFoundException>(() => {
+                Assert.Throws<FileNotFoundException>(() =>
+                {
                     var deltaBuilder = new DeltaPackageBuilder();
                     deltaBuilder.CreateDeltaPackage(baseFixture, fixture, tempFiles[2]);
                 });
-            } finally {
+            }
+            finally
+            {
                 tempFiles.ForEach(File.Delete);
             }
         }

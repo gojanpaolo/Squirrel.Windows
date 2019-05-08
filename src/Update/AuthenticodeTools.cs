@@ -43,10 +43,13 @@ namespace Squirrel.Update
             cbStruct = (uint)Marshal.SizeOf(typeof(WINTRUST_FILE_INFO));
             pcwszFilePath = fileName;
 
-            if (subject != Guid.Empty) {
+            if (subject != Guid.Empty)
+            {
                 pgKnownSubject = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(Guid)));
                 Marshal.StructureToPtr(subject, pgKnownSubject, true);
-            } else {
+            }
+            else
+            {
                 pgKnownSubject = IntPtr.Zero;
             }
 
@@ -69,18 +72,21 @@ namespace Squirrel.Update
 
         void Dispose(bool disposing)
         {
-            if (pgKnownSubject != IntPtr.Zero) {
+            if (pgKnownSubject != IntPtr.Zero)
+            {
                 Marshal.DestroyStructure(this.pgKnownSubject, typeof(Guid));
                 Marshal.FreeHGlobal(this.pgKnownSubject);
             }
         }
     }
 
-    enum AllocMethod {
+    enum AllocMethod
+    {
         HGlobal, CoTaskMem
     };
 
-    enum UnionChoice {
+    enum UnionChoice
+    {
         File = 1,
         Catalog,
         Blob,
@@ -88,24 +94,28 @@ namespace Squirrel.Update
         Cert
     };
 
-    enum UiChoice {
+    enum UiChoice
+    {
         All = 1,
         NoUI,
         NoBad,
         NoGood
     };
-    enum RevocationCheckFlags {
+    enum RevocationCheckFlags
+    {
         None = 0,
         WholeChain
     };
-    enum StateAction {
+    enum StateAction
+    {
         Ignore = 0,
         Verify,
         Close,
         AutoCache,
         AutoCacheFlush
     };
-    enum TrustProviderFlags {
+    enum TrustProviderFlags
+    {
         UseIE4Trust = 1,
         NoIE4Chain = 2,
         NoPolicyUsage = 4,
@@ -118,7 +128,8 @@ namespace Squirrel.Update
         UseDefaultOSVerCheck = 1024,
         LifetimeSigning = 2048
     };
-    enum UIContext {
+    enum UIContext
+    {
         Execute = 0,
         Install
     };
@@ -160,7 +171,7 @@ namespace Squirrel.Update
         public UIContext dwUIContext;
 
         IntPtr pwszURLReference;
-        
+
         public void Dispose()
         {
             Dispose(true);
@@ -170,7 +181,8 @@ namespace Squirrel.Update
 
         void Dispose(bool disposing)
         {
-            if (dwUnionChoice == UnionChoice.File) {
+            if (dwUnionChoice == UnionChoice.File)
+            {
                 WINTRUST_FILE_INFO info = new WINTRUST_FILE_INFO();
                 Marshal.PtrToStructure(pInfoStruct, info);
 
@@ -201,17 +213,22 @@ namespace Squirrel.Update
 
         void Dispose(bool disposing)
         {
-            if (m_ptr != IntPtr.Zero) {
-                if (m_meth == AllocMethod.HGlobal) {
+            if (m_ptr != IntPtr.Zero)
+            {
+                if (m_meth == AllocMethod.HGlobal)
+                {
                     Marshal.FreeHGlobal(m_ptr);
-                } else if (m_meth == AllocMethod.CoTaskMem) {
+                }
+                else if (m_meth == AllocMethod.CoTaskMem)
+                {
                     Marshal.FreeCoTaskMem(m_ptr);
                 }
 
                 m_ptr = IntPtr.Zero;
             }
 
-            if (disposing) {
+            if (disposing)
+            {
                 GC.SuppressFinalize(this);
             }
         }

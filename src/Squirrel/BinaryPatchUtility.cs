@@ -148,7 +148,7 @@ namespace Squirrel.Bsdiff
                         int s = 0;
                         int sf = 0;
                         int lenf = 0;
-                        for (int i = 0; (lastscan + i < scan) && (lastpos + i < oldData.Length); )
+                        for (int i = 0; (lastscan + i < scan) && (lastpos + i < oldData.Length);)
                         {
                             if (oldData[lastpos + i] == newData[lastscan + i])
                                 s++;

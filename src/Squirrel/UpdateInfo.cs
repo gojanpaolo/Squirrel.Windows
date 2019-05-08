@@ -15,8 +15,9 @@ namespace Squirrel
         [DataMember] public List<ReleaseEntry> ReleasesToApply { get; protected set; }
 
         [IgnoreDataMember]
-        public bool IsBootstrapping {
-            get { return CurrentlyInstalledVersion == null;  }
+        public bool IsBootstrapping
+        {
+            get { return CurrentlyInstalledVersion == null; }
         }
 
         [IgnoreDataMember]
@@ -37,11 +38,15 @@ namespace Squirrel
         public Dictionary<ReleaseEntry, string> FetchReleaseNotes()
         {
             return ReleasesToApply
-                .SelectMany(x => {
-                    try {
+                .SelectMany(x =>
+                {
+                    try
+                    {
                         var releaseNotes = x.GetReleaseNotes(PackageDirectory);
                         return EnumerableExtensions.Return(Tuple.Create(x, releaseNotes));
-                    } catch (Exception ex) {
+                    }
+                    catch (Exception ex)
+                    {
                         this.Log().WarnException("Couldn't get release notes for:" + x.Filename, ex);
                         return Enumerable.Empty<Tuple<ReleaseEntry, string>>();
                     }
@@ -55,15 +60,18 @@ namespace Squirrel
             Contract.Requires(!String.IsNullOrEmpty(packageDirectory));
 
             var latestFull = availableReleases.MaxBy(x => x.Version).FirstOrDefault(x => !x.IsDelta);
-            if (latestFull == null) {
+            if (latestFull == null)
+            {
                 throw new Exception("There should always be at least one full release");
             }
 
-            if (currentVersion == null) {
+            if (currentVersion == null)
+            {
                 return new UpdateInfo(null, new[] { latestFull }, packageDirectory);
             }
 
-            if (currentVersion.Version >= latestFull.Version) {
+            if (currentVersion.Version >= latestFull.Version)
+            {
                 return new UpdateInfo(currentVersion, Enumerable.Empty<ReleaseEntry>(), packageDirectory);
             }
 
@@ -73,8 +81,8 @@ namespace Squirrel
 
             var deltasSize = newerThanUs.Where(x => x.IsDelta).Sum(x => x.Filesize);
 
-            return (deltasSize < latestFull.Filesize && deltasSize > 0) ? 
-                new UpdateInfo(currentVersion, newerThanUs.Where(x => x.IsDelta).ToArray(), packageDirectory) : 
+            return (deltasSize < latestFull.Filesize && deltasSize > 0) ?
+                new UpdateInfo(currentVersion, newerThanUs.Where(x => x.IsDelta).ToArray(), packageDirectory) :
                 new UpdateInfo(currentVersion, new[] { latestFull }, packageDirectory);
         }
     }

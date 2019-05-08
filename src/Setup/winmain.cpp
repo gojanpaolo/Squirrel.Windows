@@ -11,7 +11,7 @@
 
 CAppModule* _Module;
 
-typedef BOOL(WINAPI *SetDefaultDllDirectoriesFunction)(DWORD DirectoryFlags);
+typedef BOOL(WINAPI* SetDefaultDllDirectoriesFunction)(DWORD DirectoryFlags);
 
 // Some libraries are still loaded from the current directories.
 // If we pre-load them with an absolute path then we are good.
@@ -38,17 +38,19 @@ void MitigateDllHijacking()
 	ATLASSERT(hKernel32 != NULL);
 
 	SetDefaultDllDirectoriesFunction pfn = (SetDefaultDllDirectoriesFunction)GetProcAddress(hKernel32, "SetDefaultDllDirectories");
-	if (pfn) { (*pfn)(LOAD_LIBRARY_SEARCH_SYSTEM32); }
+	if (pfn) {
+		(*pfn)(LOAD_LIBRARY_SEARCH_SYSTEM32);
+	}
 
 	PreloadLibs();
 }
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
-                      _In_opt_ HINSTANCE hPrevInstance,
-                      _In_ LPWSTR lpCmdLine,
-                      _In_ int nCmdShow)
+											_In_opt_ HINSTANCE hPrevInstance,
+											_In_ LPWSTR lpCmdLine,
+											_In_ int nCmdShow)
 {
-	MitigateDllHijacking();	
+	MitigateDllHijacking();
 
 	int exitCode = -1;
 	CString cmdLine(lpCmdLine);
@@ -96,7 +98,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			CUpdateRunner::DisplayErrorMessage(CString(L"Failed to install the .NET Framework, try installing the latest version manually"), NULL);
 			goto out;
 		}
-	
+
 		// S_FALSE isn't failure, but we still shouldn't try to install
 		if (hr != S_OK) {
 			exitCode = 0;

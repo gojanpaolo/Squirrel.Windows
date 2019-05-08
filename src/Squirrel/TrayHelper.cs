@@ -16,13 +16,19 @@ namespace Squirrel
         public List<NOTIFYITEM> GetTrayItems()
         {
             var instance = new TrayNotify();
-            try {
-                if (useLegacyInterface()) {
+            try
+            {
+                if (useLegacyInterface())
+                {
                     return getTrayItemsWin7(instance);
-                } else {
+                }
+                else
+                {
                     return getTrayItems(instance);
                 }
-            } finally {
+            }
+            finally
+            {
                 Marshal.ReleaseComObject(instance);
             }
         }
@@ -31,19 +37,24 @@ namespace Squirrel
         {
             var instance = new TrayNotify();
 
-            try {
+            try
+            {
                 var items = default(List<NOTIFYITEM>);
                 var legacy = useLegacyInterface();
 
-                if (legacy) {
+                if (legacy)
+                {
                     items = getTrayItemsWin7(instance);
-                } else {
+                }
+                else
+                {
                     items = getTrayItems(instance);
                 }
 
                 exeToPromote = exeToPromote.ToLowerInvariant();
 
-                for (int i = 0; i < items.Count; i++) {
+                for (int i = 0; i < items.Count; i++)
+                {
                     var item = items[i];
                     var exeName = item.exe_name.ToLowerInvariant();
 
@@ -53,17 +64,24 @@ namespace Squirrel
                     item.preference = NOTIFYITEM_PREFERENCE.PREFERENCE_SHOW_ALWAYS;
 
                     var writable = NOTIFYITEM_Writable.fromNotifyItem(item);
-                    if (legacy) {
+                    if (legacy)
+                    {
                         var notifier = (ITrayNotifyWin7)instance;
                         notifier.SetPreference(ref writable);
-                    } else {
+                    }
+                    else
+                    {
                         var notifier = (ITrayNotify)instance;
                         notifier.SetPreference(ref writable);
                     }
                 }
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 Console.WriteLine("Failed to promote Tray icon: " + ex.ToString());
-            } finally {
+            }
+            finally
+            {
                 Marshal.ReleaseComObject(instance);
             }
         }
@@ -71,9 +89,12 @@ namespace Squirrel
         public unsafe void RemoveDeadEntries(List<string> executablesInPackage, string rootAppDirectory, string currentAppVersion)
         {
             var iconStreamData = default(byte[]);
-            try {
+            try
+            {
                 iconStreamData = (byte[])Registry.GetValue("HKEY_CURRENT_USER\\Software\\Classes\\Local Settings\\Software\\Microsoft\\Windows\\CurrentVersion\\TrayNotify", "IconStreams", new byte[] { 00 });
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 Console.WriteLine("Couldn't load IconStreams key, bailing: " + ex.ToString());
                 return;
             }
@@ -82,15 +103,18 @@ namespace Squirrel
             var toKeep = new List<byte[]>();
             var header = default(IconStreamsHeader);
 
-            fixed (byte* b = iconStreamData) {
+            fixed (byte* b = iconStreamData)
+            {
                 header = (IconStreamsHeader)Marshal.PtrToStructure((IntPtr)b, typeof(IconStreamsHeader));
                 byte* current;
 
                 if (header.count <= 1) return;
 
-                for (int i=0; i < header.count; i++) {
+                for (int i = 0; i < header.count; i++)
+                {
                     var offset = Marshal.SizeOf(typeof(IconStreamsHeader)) + (i * Marshal.SizeOf(typeof(IconStreamsItem)));
-                    if (offset > iconStreamData.Length) {
+                    if (offset > iconStreamData.Length)
+                    {
                         this.Log().Error("Corrupted IconStreams regkey, bailing");
                         return;
                     }
@@ -99,39 +123,46 @@ namespace Squirrel
 
                     var item = (IconStreamsItem)Marshal.PtrToStructure((IntPtr)current, typeof(IconStreamsItem));
 
-                    try {
+                    try
+                    {
                         var path = item.ExePath.ToLowerInvariant();
 
                         // Someone completely unrelated? Keep it!
-                        if (!executablesInPackage.Any(exe => path.Contains(exe))) {
+                        if (!executablesInPackage.Any(exe => path.Contains(exe)))
+                        {
                             goto keepItem;
                         }
-                        
+
                         // Not an installed app? Keep it!
-                        if (!path.StartsWith(rootAppDirectory, StringComparison.Ordinal)) {
+                        if (!path.StartsWith(rootAppDirectory, StringComparison.Ordinal))
+                        {
                             goto keepItem;
                         }
 
                         // The current version? Keep it!
-                        if (path.Contains("app-" + currentAppVersion)) {
+                        if (path.Contains("app-" + currentAppVersion))
+                        {
                             goto keepItem;
                         }
 
                         // Don't keep this item, remove it from IconStreams
                         continue;
 
-                    keepItem:
+                        keepItem:
 
                         var newItem = new byte[Marshal.SizeOf(typeof(IconStreamsItem))];
                         Array.Copy(iconStreamData, offset, newItem, 0, newItem.Length);
                         toKeep.Add(newItem);
-                    } catch (Exception ex) {
+                    }
+                    catch (Exception ex)
+                    {
                         this.Log().ErrorException("Failed to parse IconStreams regkey", ex);
                         return;
                     }
                 }
 
-                if (header.count == toKeep.Count) {
+                if (header.count == toKeep.Count)
+                {
                     return;
                 }
 
@@ -139,18 +170,22 @@ namespace Squirrel
                 Marshal.StructureToPtr(header, (IntPtr)b, false);
 
                 current = b + Marshal.SizeOf(typeof(IconStreamsHeader));
-                for(int i = 0; i < toKeep.Count; i++) {
+                for (int i = 0; i < toKeep.Count; i++)
+                {
                     Marshal.Copy(toKeep[i], 0, (IntPtr)current, toKeep[i].Length);
                     current += toKeep[i].Length;
                 }
             }
 
-            try {
+            try
+            {
                 var newSize = Marshal.SizeOf(typeof(IconStreamsHeader)) + (toKeep.Count * Marshal.SizeOf(typeof(IconStreamsItem)));
                 var toSave = new byte[newSize];
                 Array.Copy(iconStreamData, toSave, newSize);
                 Registry.SetValue("HKEY_CURRENT_USER\\Software\\Classes\\Local Settings\\Software\\Microsoft\\Windows\\CurrentVersion\\TrayNotify", "IconStreams", toSave);
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 Console.WriteLine("Failed to write new IconStreams regkey: " + ex.ToString());
             }
 
@@ -248,7 +283,8 @@ namespace Squirrel
 
         public static NOTIFYITEM_Writable fromNotifyItem(NOTIFYITEM item)
         {
-            return new NOTIFYITEM_Writable {
+            return new NOTIFYITEM_Writable
+            {
                 exe_name = Marshal.StringToCoTaskMemAuto(item.exe_name),
                 tip = Marshal.StringToCoTaskMemAuto(item.tip),
                 icon = item.icon,
@@ -293,7 +329,8 @@ namespace Squirrel
     [ComImport, Guid("25DEAD04-1EAC-4911-9E3A-AD0A4AB560FD")]
     class TrayNotify { }
 
-    public struct IconStreamsHeader {
+    public struct IconStreamsHeader
+    {
         public uint cbSize;
         public uint unknown1;
         public uint unknown2;
@@ -301,26 +338,31 @@ namespace Squirrel
         public uint unknown3;
     }
 
-    public struct IconStreamsItem {
+    public struct IconStreamsItem
+    {
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 528)]
         public byte[] exe_path;
 
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 1112)]
         public byte[] dontcare;
 
-        public unsafe string ExePath {
+        public unsafe string ExePath
+        {
             get {
                 byte[] exeCopy = new byte[exe_path.Length];
 
                 // https://raw.githubusercontent.com/lestert2005/SystemTrayModder/b1061f3758f8ff9c43d77157c7a62c7e5cc6885d/source/Program.cs
-                for (int i=0; i < exe_path.Length; i++) {
+                for (int i = 0; i < exe_path.Length; i++)
+                {
                     var b = exe_path[i];
-                    if (b > 64 && b < 91) {
+                    if (b > 64 && b < 91)
+                    {
                         exeCopy[i] = (byte)((b - 64 + 13) % 26 + 64);
                         continue;
                     }
 
-                    if (b > 96 && b < 123) {
+                    if (b > 96 && b < 123)
+                    {
                         exeCopy[i] = (byte)((b - 96 + 13) % 26 + 96);
                         continue;
                     }
@@ -328,7 +370,8 @@ namespace Squirrel
                     exeCopy[i] = b;
                 }
 
-                fixed (byte* b = exeCopy) {
+                fixed (byte* b = exeCopy)
+                {
                     return Marshal.PtrToStringUni((IntPtr)b);
                 }
             }

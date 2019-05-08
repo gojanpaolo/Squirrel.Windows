@@ -700,7 +700,7 @@ namespace MarkdownSharp
         private static string GetHashKey(string s, bool isHtmlBlock)
         {
             var delim = isHtmlBlock ? 'H' : 'E';
-            return "\x1A" + delim +  Math.Abs(s.GetHashCode()).ToString() + delim;
+            return "\x1A" + delim + Math.Abs(s.GetHashCode()).ToString() + delim;
         }
 
         private static Regex _htmlTokens = new Regex(@"

@@ -26,12 +26,14 @@ namespace Squirrel.Update
         internal bool noMsi { get; private set; } = (Environment.OSVersion.Platform != PlatformID.Win32NT);        // NB: WiX doesn't work under Mono / Wine
         internal bool packageAs64Bit { get; private set; } = false;
         internal bool noDelta { get; private set; } = false;
-               
-        public StartupOption(string[] args) {
-           optionSet = Parse(args);
+
+        public StartupOption(string[] args)
+        {
+            optionSet = Parse(args);
         }
 
-        private OptionSet Parse(string[] args) {
+        private OptionSet Parse(string[] args)
+        {
             var opts = new OptionSet() {
                 "Usage: Squirrel.exe command [OPTS]",
                 "Manages Squirrel packages",
@@ -77,7 +79,8 @@ namespace Squirrel.Update
             return opts;
         }
 
-        internal void WriteOptionDescriptions() {
+        internal void WriteOptionDescriptions()
+        {
             optionSet.WriteOptionDescriptions(Console.Out);
         }
     }

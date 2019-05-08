@@ -24,14 +24,17 @@ namespace Squirrel.Tests
                 string remotePkgPath;
                 string path;
 
-                using (Utility.WithTempDirectory(out path)) {
+                using (Utility.WithTempDirectory(out path))
+                {
                     using (Utility.WithTempDirectory(out remotePkgPath))
-                    using (var mgr = new UpdateManager(remotePkgPath, "theApp", path)) {
+                    using (var mgr = new UpdateManager(remotePkgPath, "theApp", path))
+                    {
                         IntegrationTestHelper.CreateFakeInstalledApp("1.0.0.1", remotePkgPath);
                         await mgr.FullInstall();
                     }
 
-                    using (var mgr = new UpdateManager("http://lol", "theApp", path)) {
+                    using (var mgr = new UpdateManager("http://lol", "theApp", path))
+                    {
                         await mgr.CreateUninstallerRegistryEntry();
                         var regKey = await mgr.CreateUninstallerRegistryEntry();
 
@@ -48,7 +51,8 @@ namespace Squirrel.Tests
                 var key = RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Default)
                     .OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Uninstall");
 
-                using (key) {
+                using (key)
+                {
                     Assert.False(key.GetSubKeyNames().Contains("theApp"));
                 }
             }
@@ -60,7 +64,8 @@ namespace Squirrel.Tests
             public async Task UpdateLocalReleasesSmokeTest()
             {
                 string tempDir;
-                using (Utility.WithTempDirectory(out tempDir)) {
+                using (Utility.WithTempDirectory(out tempDir))
+                {
                     var appDir = Path.Combine(tempDir, "theApp");
                     var packageDir = Directory.CreateDirectory(Path.Combine(appDir, "packages"));
 
@@ -86,7 +91,8 @@ namespace Squirrel.Tests
             public async Task InitialInstallSmokeTest()
             {
                 string tempDir;
-                using (Utility.WithTempDirectory(out tempDir)) {
+                using (Utility.WithTempDirectory(out tempDir))
+                {
                     var remotePackageDir = Directory.CreateDirectory(Path.Combine(tempDir, "remotePackages"));
                     var localAppDir = Path.Combine(tempDir, "theApp");
 
@@ -94,7 +100,8 @@ namespace Squirrel.Tests
                         "Squirrel.Core.1.0.0.0-full.nupkg",
                     }.ForEach(x => File.Copy(IntegrationTestHelper.GetPath("fixtures", x), Path.Combine(remotePackageDir.FullName, x)));
 
-                    using (var fixture = new UpdateManager(remotePackageDir.FullName, "theApp", tempDir)) {
+                    using (var fixture = new UpdateManager(remotePackageDir.FullName, "theApp", tempDir))
+                    {
                         await fixture.FullInstall();
                     }
 
@@ -157,21 +164,23 @@ namespace Squirrel.Tests
                         "Squirrel.Core.1.0.0.0-full.nupkg",
                         "Squirrel.Core.1.1.0.0-delta.nupkg",
                         "Squirrel.Core.1.1.0.0-full.nupkg",
-                    }.ForEach(x => {
+                    }.ForEach(x =>
+                    {
                         var path = IntegrationTestHelper.GetPath("fixtures", x);
                         File.Copy(path, Path.Combine(localPackages, x));
                         File.Copy(path, Path.Combine(remotePackages, x));
                     });
 
                     var fixture = new UpdateManager.ApplyReleasesImpl(appDir);
-                        
+
                     // sync both release files
                     await fixture.updateLocalReleasesFile();
                     ReleaseEntry.BuildReleasesFile(remotePackages);
 
                     // check for an update
                     UpdateInfo updateInfo;
-                    using (var mgr = new UpdateManager(remotePackages, "theApp", tempDir, new FakeUrlDownloader())) {
+                    using (var mgr = new UpdateManager(remotePackages, "theApp", tempDir, new FakeUrlDownloader()))
+                    {
                         updateInfo = await mgr.CheckForUpdate();
                     }
 
@@ -196,7 +205,8 @@ namespace Squirrel.Tests
                         "Squirrel.Core.1.0.0.0-full.nupkg",
                         "Squirrel.Core.1.1.0.0-delta.nupkg",
                         "Squirrel.Core.1.1.0.0-full.nupkg",
-                    }.ForEach(x => {
+                    }.ForEach(x =>
+                    {
                         var path = IntegrationTestHelper.GetPath("fixtures", x);
                         File.Copy(path, Path.Combine(localPackages, x));
                     });
@@ -204,7 +214,8 @@ namespace Squirrel.Tests
                     new[] {
                         "Squirrel.Core.1.0.0.0-full.nupkg",
                         "Squirrel.Core.1.1.0.0-full.nupkg",
-                    }.ForEach(x => {
+                    }.ForEach(x =>
+                    {
                         var path = IntegrationTestHelper.GetPath("fixtures", x);
                         File.Copy(path, Path.Combine(remotePackages, x));
                     });
@@ -216,7 +227,8 @@ namespace Squirrel.Tests
                     ReleaseEntry.BuildReleasesFile(remotePackages);
 
                     UpdateInfo updateInfo;
-                    using (var mgr = new UpdateManager(remotePackages, "theApp", tempDir, new FakeUrlDownloader())) {
+                    using (var mgr = new UpdateManager(remotePackages, "theApp", tempDir, new FakeUrlDownloader()))
+                    {
                         updateInfo = await mgr.CheckForUpdate();
                     }
 
@@ -237,7 +249,8 @@ namespace Squirrel.Tests
                     Directory.CreateDirectory(localPackages);
                     Directory.CreateDirectory(remotePackages);
 
-                    new[] { "Squirrel.Core.1.0.0.0-full.nupkg", }.ForEach(x => {
+                    new[] { "Squirrel.Core.1.0.0.0-full.nupkg", }.ForEach(x =>
+                    {
                         var path = IntegrationTestHelper.GetPath("fixtures", x);
                         File.Copy(path, Path.Combine(localPackages, x));
                     });
@@ -246,7 +259,8 @@ namespace Squirrel.Tests
                         "Squirrel.Core.1.0.0.0-full.nupkg",
                         "Squirrel.Core.1.1.0.0-delta.nupkg",
                         "Squirrel.Core.1.1.0.0-full.nupkg",
-                    }.ForEach(x => {
+                    }.ForEach(x =>
+                    {
                         var path = IntegrationTestHelper.GetPath("fixtures", x);
                         File.Copy(path, Path.Combine(remotePackages, x));
                     });
@@ -257,7 +271,8 @@ namespace Squirrel.Tests
                     await fixture.updateLocalReleasesFile();
                     ReleaseEntry.BuildReleasesFile(remotePackages);
 
-                    using (var mgr = new UpdateManager(remotePackages, "theApp", tempDir, new FakeUrlDownloader())) {
+                    using (var mgr = new UpdateManager(remotePackages, "theApp", tempDir, new FakeUrlDownloader()))
+                    {
                         UpdateInfo updateInfo;
                         updateInfo = await mgr.CheckForUpdate();
                         Assert.True(updateInfo.ReleasesToApply.First().IsDelta);
@@ -272,11 +287,13 @@ namespace Squirrel.Tests
             public async Task WhenFolderDoesNotExistThrowHelpfulError()
             {
                 string tempDir;
-                using (Utility.WithTempDirectory(out tempDir)) {
+                using (Utility.WithTempDirectory(out tempDir))
+                {
                     var directory = Path.Combine(tempDir, "missing-folder");
                     var fixture = new UpdateManager(directory, "MyAppName");
 
-                    using (fixture) {
+                    using (fixture)
+                    {
                         await Assert.ThrowsAsync<Exception>(() => fixture.CheckForUpdate());
                     }
                 }
@@ -286,10 +303,12 @@ namespace Squirrel.Tests
             public async Task WhenReleasesFileDoesntExistThrowACustomError()
             {
                 string tempDir;
-                using (Utility.WithTempDirectory(out tempDir)) {
+                using (Utility.WithTempDirectory(out tempDir))
+                {
                     var fixture = new UpdateManager(tempDir, "MyAppName");
 
-                    using (fixture) {
+                    using (fixture)
+                    {
                         await Assert.ThrowsAsync<Exception>(() => fixture.CheckForUpdate());
                     }
                 }
@@ -299,11 +318,13 @@ namespace Squirrel.Tests
             public async Task WhenReleasesFileIsBlankThrowAnException()
             {
                 string tempDir;
-                using (Utility.WithTempDirectory(out tempDir)) {
+                using (Utility.WithTempDirectory(out tempDir))
+                {
                     var fixture = new UpdateManager(tempDir, "MyAppName");
                     File.WriteAllText(Path.Combine(tempDir, "RELEASES"), "");
 
-                    using (fixture) {
+                    using (fixture)
+                    {
                         await Assert.ThrowsAsync(typeof(Exception), () => fixture.CheckForUpdate());
                     }
                 }
@@ -313,7 +334,8 @@ namespace Squirrel.Tests
             public async Task WhenUrlResultsInWebExceptionWeShouldThrow()
             {
                 // This should result in a WebException (which gets caught) unless you can actually access http://lol
-                using (var fixture = new UpdateManager("http://lol", "theApp")) {
+                using (var fixture = new UpdateManager("http://lol", "theApp"))
+                {
                     await Assert.ThrowsAsync(typeof(WebException), () => fixture.CheckForUpdate());
                 }
             }
@@ -327,7 +349,8 @@ namespace Squirrel.Tests
                 input = Environment.ExpandEnvironmentVariables(input);
                 var expected = expectedVersion != null ? new SemanticVersion(expectedVersion) : default(SemanticVersion);
 
-                using (var fixture = new UpdateManager("http://lol", "theApp")) {
+                using (var fixture = new UpdateManager("http://lol", "theApp"))
+                {
                     Assert.Equal(expected, fixture.CurrentlyInstalledVersion(input));
                 }
             }

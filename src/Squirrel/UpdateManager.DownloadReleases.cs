@@ -28,13 +28,17 @@ namespace Squirrel
                 double current = 0;
                 double toIncrement = 100.0 / releasesToDownload.Count();
 
-                if (Utility.IsHttpUrl(updateUrlOrPath)) {
+                if (Utility.IsHttpUrl(updateUrlOrPath))
+                {
                     // From Internet
-                    await releasesToDownload.ForEachAsync(async x => {
+                    await releasesToDownload.ForEachAsync(async x =>
+                    {
                         var targetFile = Path.Combine(packagesDirectory, x.Filename);
                         double component = 0;
-                        await downloadRelease(updateUrlOrPath, x, urlDownloader, targetFile, p => {
-                            lock (progress) {
+                        await downloadRelease(updateUrlOrPath, x, urlDownloader, targetFile, p =>
+                        {
+                            lock (progress)
+                            {
                                 current -= component;
                                 component = toIncrement / 100.0 * p;
                                 progress((int)Math.Round(current += component));
@@ -43,9 +47,12 @@ namespace Squirrel
 
                         checksumPackage(x);
                     });
-                } else {
+                }
+                else
+                {
                     // From Disk
-                    await releasesToDownload.ForEachAsync(x => {
+                    await releasesToDownload.ForEachAsync(x =>
+                    {
                         var targetFile = Path.Combine(packagesDirectory, x.Filename);
 
                         File.Copy(
@@ -61,7 +68,7 @@ namespace Squirrel
 
             bool isReleaseExplicitlyHttp(ReleaseEntry x)
             {
-                return x.BaseUrl != null && 
+                return x.BaseUrl != null &&
                     Uri.IsWellFormedUriString(x.BaseUrl, UriKind.Absolute);
             }
 
@@ -70,7 +77,8 @@ namespace Squirrel
                 var baseUri = Utility.EnsureTrailingSlash(new Uri(updateBaseUrl));
 
                 var releaseEntryUrl = releaseEntry.BaseUrl + releaseEntry.Filename;
-                if (!String.IsNullOrEmpty(releaseEntry.Query)) {
+                if (!String.IsNullOrEmpty(releaseEntry.Query))
+                {
                     releaseEntryUrl += releaseEntry.Query;
                 }
                 var sourceFileUrl = new Uri(baseUri, releaseEntryUrl).AbsoluteUri;
@@ -89,23 +97,27 @@ namespace Squirrel
                 var targetPackage = new FileInfo(
                     Path.Combine(rootAppDirectory, "packages", downloadedRelease.Filename));
 
-                if (!targetPackage.Exists) {
+                if (!targetPackage.Exists)
+                {
                     this.Log().Error("File {0} should exist but doesn't", targetPackage.FullName);
 
                     throw new Exception("Checksummed file doesn't exist: " + targetPackage.FullName);
                 }
 
-                if (targetPackage.Length != downloadedRelease.Filesize) {
+                if (targetPackage.Length != downloadedRelease.Filesize)
+                {
                     this.Log().Error("File Length should be {0}, is {1}", downloadedRelease.Filesize, targetPackage.Length);
                     targetPackage.Delete();
 
                     throw new Exception("Checksummed file size doesn't match: " + targetPackage.FullName);
                 }
 
-                using (var file = targetPackage.OpenRead()) {
+                using (var file = targetPackage.OpenRead())
+                {
                     var hash = Utility.CalculateStreamSHA1(file);
 
-                    if (!hash.Equals(downloadedRelease.SHA1,StringComparison.OrdinalIgnoreCase)) {
+                    if (!hash.Equals(downloadedRelease.SHA1, StringComparison.OrdinalIgnoreCase))
+                    {
                         this.Log().Error("File SHA1 should be {0}, is {1}", downloadedRelease.SHA1, hash);
                         targetPackage.Delete();
                         throw new Exception("Checksum doesn't match: " + targetPackage.FullName);

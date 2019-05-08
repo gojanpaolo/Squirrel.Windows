@@ -21,7 +21,8 @@ namespace Squirrel.Tests
 
         public IDisposable Start()
         {
-            if (inner != null) {
+            if (inner != null)
+            {
                 throw new InvalidOperationException("Already started!");
             }
 
@@ -30,11 +31,14 @@ namespace Squirrel.Tests
             server.Start();
 
             bool shouldStop = false;
-            var listener = Task.Run(async () => {
-                while (!shouldStop) {
+            var listener = Task.Run(async () =>
+            {
+                while (!shouldStop)
+                {
                     var ctx = await server.GetContextAsync();
 
-                    if (ctx.Request.HttpMethod != "GET") {
+                    if (ctx.Request.HttpMethod != "GET")
+                    {
                         closeResponseWith(ctx, 400, "GETs only");
                         return;
                     }
@@ -42,29 +46,36 @@ namespace Squirrel.Tests
                     var target = Path.Combine(RootPath, ctx.Request.Url.AbsolutePath.Replace('/', Path.DirectorySeparatorChar).Substring(1));
                     var fi = new FileInfo(target);
 
-                    if (!fi.FullName.StartsWith(RootPath)) {
+                    if (!fi.FullName.StartsWith(RootPath))
+                    {
                         closeResponseWith(ctx, 401, "Not authorized");
                         return;
                     }
 
-                    if (!fi.Exists) {
+                    if (!fi.Exists)
+                    {
                         closeResponseWith(ctx, 404, "Not found");
                         return;
                     }
 
-                    try {
-                        using (var input = File.OpenRead(target)) {
+                    try
+                    {
+                        using (var input = File.OpenRead(target))
+                        {
                             ctx.Response.StatusCode = 200;
                             input.CopyTo(ctx.Response.OutputStream);
                             ctx.Response.Close();
                         }
-                    } catch (Exception ex) {
+                    }
+                    catch (Exception ex)
+                    {
                         closeResponseWith(ctx, 500, ex.ToString());
                     }
                 }
             });
 
-            var ret = Disposable.Create(() => {
+            var ret = Disposable.Create(() =>
+            {
                 shouldStop = true;
                 server.Stop();
                 listener.Wait(2000);
@@ -79,7 +90,8 @@ namespace Squirrel.Tests
         static void closeResponseWith(HttpListenerContext ctx, int statusCode, string message)
         {
             ctx.Response.StatusCode = statusCode;
-            using (var sw = new StreamWriter(ctx.Response.OutputStream, Encoding.UTF8)) {
+            using (var sw = new StreamWriter(ctx.Response.OutputStream, Encoding.UTF8))
+            {
                 sw.WriteLine(message);
             }
             ctx.Response.Close();
@@ -88,7 +100,8 @@ namespace Squirrel.Tests
         public void Dispose()
         {
             var toDispose = Interlocked.Exchange(ref inner, null);
-            if (toDispose != null) {
+            if (toDispose != null)
+            {
                 toDispose.Dispose();
             }
         }

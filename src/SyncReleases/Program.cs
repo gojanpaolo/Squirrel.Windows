@@ -16,16 +16,19 @@ using Squirrel.Json;
 
 namespace SyncReleases
 {
-    class Program : IEnableLogger 
+    class Program : IEnableLogger
     {
         static OptionSet opts;
 
         public static int Main(string[] args)
         {
             var pg = new Program();
-            try {
+            try
+            {
                 return pg.main(args).Result;
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 // NB: Normally this is a terrible idea but we want to make
                 // sure Setup.exe above us gets the nonzero error code
                 Console.Error.WriteLine(ex);
@@ -35,7 +38,8 @@ namespace SyncReleases
 
         async Task<int> main(string[] args)
         {
-            using (var logger = new SetupLogLogger(false) { Level = Splat.LogLevel.Info }) {
+            using (var logger = new SetupLogLogger(false) { Level = Splat.LogLevel.Info })
+            {
                 Splat.Locator.CurrentMutable.Register(() => logger, typeof(Splat.ILogger));
 
                 var releaseDir = default(string);
@@ -55,7 +59,8 @@ namespace SyncReleases
 
                 opts.Parse(args);
 
-                if (repoUrl == null || repoUrl.StartsWith("http", true, CultureInfo.InvariantCulture) == false) {
+                if (repoUrl == null || repoUrl.StartsWith("http", true, CultureInfo.InvariantCulture) == false)
+                {
                     ShowHelp();
                     return -1;
                 }
@@ -64,17 +69,23 @@ namespace SyncReleases
                 if (!releaseDirectoryInfo.Exists) releaseDirectoryInfo.Create();
 
                 var githubException = default(Exception);
-                try {
+                try
+                {
                     await SyncImplementations.SyncFromGitHub(repoUrl, token, releaseDirectoryInfo);
                     return 0;
-                } catch (Exception ex) {
+                }
+                catch (Exception ex)
+                {
                     githubException = ex;
                     Console.Error.WriteLine("Attempting to sync URL as remote RELEASES folder");
                 }
 
-                try {
+                try
+                {
                     await SyncImplementations.SyncRemoteReleases(new Uri(repoUrl), releaseDirectoryInfo);
-                } catch (Exception) {
+                }
+                catch (Exception)
+                {
                     Console.Error.WriteLine("Failed to sync URL as GitHub repo: " + githubException.Message);
                     throw;
                 }
@@ -82,7 +93,7 @@ namespace SyncReleases
 
             return 0;
         }
-        
+
         public void ShowHelp()
         {
             opts.WriteOptionDescriptions(Console.Out);
@@ -98,7 +109,7 @@ namespace SyncReleases
         public SetupLogLogger(bool saveInTemp)
         {
             var dir = saveInTemp ?
-                Path.GetTempPath() : 
+                Path.GetTempPath() :
                 Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
 
             var file = Path.Combine(dir, "SquirrelSetup.log");
@@ -109,7 +120,8 @@ namespace SyncReleases
 
         public void Write(string message, Splat.LogLevel logLevel)
         {
-            if (logLevel < Level) {
+            if (logLevel < Level)
+            {
                 return;
             }
 
@@ -118,7 +130,7 @@ namespace SyncReleases
 
         public void Dispose()
         {
-            lock(gate) inner.Dispose();
+            lock (gate) inner.Dispose();
         }
     }
 }

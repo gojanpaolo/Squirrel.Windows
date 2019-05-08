@@ -19,7 +19,7 @@ namespace Squirrel.Tests.TestHelpers
         public static string GetPath(params string[] paths)
         {
             var ret = GetIntegrationTestRootDirectory();
-            return (new FileInfo(paths.Aggregate (ret, Path.Combine))).FullName;
+            return (new FileInfo(paths.Aggregate(ret, Path.Combine))).FullName;
         }
 
         public static string GetIntegrationTestRootDirectory()
@@ -35,17 +35,21 @@ namespace Squirrel.Tests.TestHelpers
 
         public static bool SkipTestOnXPAndVista()
         {
-            int osVersion = Environment.OSVersion.Version.Major*100 + Environment.OSVersion.Version.Minor;
+            int osVersion = Environment.OSVersion.Version.Major * 100 + Environment.OSVersion.Version.Minor;
             return (osVersion < 601);
         }
 
         public static void RunBlockAsSTA(Action block)
         {
             Exception ex = null;
-            var t = new Thread(() => {
-                try {
+            var t = new Thread(() =>
+            {
+                try
+                {
                     block();
-                } catch (Exception e) {
+                }
+                catch (Exception e)
+                {
                     ex = e;
                 }
             });
@@ -54,7 +58,8 @@ namespace Squirrel.Tests.TestHelpers
             t.Start();
             t.Join();
 
-            if (ex != null) {
+            if (ex != null)
+            {
                 // NB: If we don't do this, the test silently passes
                 throw new Exception("", ex);
             }
@@ -79,18 +84,20 @@ namespace Squirrel.Tests.TestHelpers
             var nuget = IntegrationTestHelper.GetPath("..", ".nuget", "nuget.exe");
             nuspecFile = nuspecFile ?? "SquirrelInstalledApp.nuspec";
 
-            using (var clearTemp = Utility.WithTempDirectory(out targetDir)) {
+            using (var clearTemp = Utility.WithTempDirectory(out targetDir))
+            {
                 var nuspec = File.ReadAllText(IntegrationTestHelper.GetPath("fixtures", nuspecFile), Encoding.UTF8);
                 File.WriteAllText(Path.Combine(targetDir, nuspecFile), nuspec.Replace("0.1.0", version), Encoding.UTF8);
 
                 File.Copy(
-                    IntegrationTestHelper.GetPath("fixtures", "SquirrelAwareApp.exe"), 
+                    IntegrationTestHelper.GetPath("fixtures", "SquirrelAwareApp.exe"),
                     Path.Combine(targetDir, "SquirrelAwareApp.exe"));
                 File.Copy(
-                    IntegrationTestHelper.GetPath("fixtures", "NotSquirrelAwareApp.exe"), 
+                    IntegrationTestHelper.GetPath("fixtures", "NotSquirrelAwareApp.exe"),
                     Path.Combine(targetDir, "NotSquirrelAwareApp.exe"));
 
-                var psi = new ProcessStartInfo(nuget, "pack " + Path.Combine(targetDir, nuspecFile)) {
+                var psi = new ProcessStartInfo(nuget, "pack " + Path.Combine(targetDir, nuspecFile))
+                {
                     RedirectStandardError = true,
                     RedirectStandardOutput = true,
                     UseShellExecute = false,
@@ -103,7 +110,7 @@ namespace Squirrel.Tests.TestHelpers
                 pi.WaitForExit();
                 var output = pi.StandardOutput.ReadToEnd();
                 var err = pi.StandardError.ReadToEnd();
-                Console.WriteLine(output);  Console.WriteLine(err);
+                Console.WriteLine(output); Console.WriteLine(err);
 
                 var di = new DirectoryInfo(targetDir);
                 var pkg = di.EnumerateFiles("*.nupkg").First();
@@ -135,7 +142,8 @@ namespace Squirrel.Tests.TestHelpers
 
             var opts = new ExtractionOptions() { ExtractFullPath = true, Overwrite = true, PreserveFileTime = true };
             using (var za = ZipArchive.Open(zipFile))
-            using (var reader = za.ExtractAllEntries()) {
+            using (var reader = za.ExtractAllEntries())
+            {
                 reader.WriteEntryToDirectory(path, opts);
             }
 

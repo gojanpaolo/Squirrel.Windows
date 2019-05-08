@@ -8,8 +8,14 @@ void CUpdateRunner::DisplayErrorMessage(CString& errorMessage, wchar_t* logFile)
 {
 	CTaskDialog dlg;
 	TASKDIALOG_BUTTON buttons[] = {
-		{ 1, L"Open Setup Log", },
-		{ 2, L"Close", },
+			{
+					1,
+					L"Open Setup Log",
+			},
+			{
+					2,
+					L"Close",
+			},
 	};
 
 	// TODO: Something about contacting support?
@@ -62,7 +68,7 @@ out:
 	return hr;
 }
 
-HRESULT FindDesktopFolderView(REFIID riid, void **ppv)
+HRESULT FindDesktopFolderView(REFIID riid, void** ppv)
 {
 	HRESULT hr;
 
@@ -75,8 +81,8 @@ HRESULT FindDesktopFolderView(REFIID riid, void **ppv)
 	CComPtr<IDispatch> spdisp;
 
 	hr = spShellWindows->FindWindowSW(
-		&vtLoc, &vtEmpty,
-		SWC_DESKTOP, &lhwnd, SWFO_NEEDDISPATCH, &spdisp);
+			&vtLoc, &vtEmpty,
+			SWC_DESKTOP, &lhwnd, SWFO_NEEDDISPATCH, &spdisp);
 	if (FAILED(hr)) return hr;
 
 	CComPtr<IShellBrowser> spBrowser;
@@ -93,7 +99,7 @@ HRESULT FindDesktopFolderView(REFIID riid, void **ppv)
 	return S_OK;
 }
 
-HRESULT GetDesktopAutomationObject(REFIID riid, void **ppv)
+HRESULT GetDesktopAutomationObject(REFIID riid, void** ppv)
 {
 	HRESULT hr;
 
@@ -120,12 +126,7 @@ HRESULT CUpdateRunner::ShellExecuteFromExplorer(LPWSTR pszFile, LPWSTR pszParame
 	hr = spFolderView->get_Application(&spdispShell);
 	if (FAILED(hr)) return hr;
 
-	return CComQIPtr<IShellDispatch2>(spdispShell)->ShellExecute(
-		CComBSTR(pszFile),
-		CComVariant(pszParameters ? pszParameters : L""),
-		CComVariant(L""),
-		CComVariant(L""),
-		CComVariant(SW_SHOWDEFAULT));
+	return CComQIPtr<IShellDispatch2>(spdispShell)->ShellExecute(CComBSTR(pszFile), CComVariant(pszParameters ? pszParameters : L""), CComVariant(L""), CComVariant(L""), CComVariant(SW_SHOWDEFAULT));
 }
 
 bool CUpdateRunner::DirectoryExists(wchar_t* szPath)
@@ -133,35 +134,35 @@ bool CUpdateRunner::DirectoryExists(wchar_t* szPath)
 	DWORD dwAttrib = GetFileAttributes(szPath);
 
 	return (dwAttrib != INVALID_FILE_ATTRIBUTES &&
-		(dwAttrib & FILE_ATTRIBUTE_DIRECTORY));
+					(dwAttrib & FILE_ATTRIBUTE_DIRECTORY));
 }
 
-bool CUpdateRunner::DirectoryIsWritable(wchar_t * szPath)
+bool CUpdateRunner::DirectoryIsWritable(wchar_t* szPath)
 {
-		wchar_t szTempFileName[MAX_PATH];
-		UINT uRetVal = GetTempFileNameW(szPath, L"Squirrel", 0, szTempFileName);
-		if (uRetVal == 0) {
-			return false;
-		}
-		DeleteFile(szTempFileName);
-		return true;
+	wchar_t szTempFileName[MAX_PATH];
+	UINT uRetVal = GetTempFileNameW(szPath, L"Squirrel", 0, szTempFileName);
+	if (uRetVal == 0) {
+		return false;
+	}
+	DeleteFile(szTempFileName);
+	return true;
 }
 
 int CUpdateRunner::ExtractUpdaterAndRun(wchar_t* lpCommandLine, bool useFallbackDir)
 {
-	PROCESS_INFORMATION pi = { 0 };
-	STARTUPINFO si = { 0 };
+	PROCESS_INFORMATION pi = {0};
+	STARTUPINFO si = {0};
 	CResource zipResource;
-	wchar_t targetDir[MAX_PATH] = { 0 };
+	wchar_t targetDir[MAX_PATH] = {0};
 	wchar_t logFile[MAX_PATH];
 
 	std::vector<CString> to_delete;
 
 	wchar_t* envSquirrelTemp = _wgetenv(L"SQUIRREL_TEMP");
 	if (envSquirrelTemp &&
-		DirectoryExists(envSquirrelTemp) &&
-		DirectoryIsWritable(envSquirrelTemp) &&
-		!PathIsUNCW(envSquirrelTemp)) {
+			DirectoryExists(envSquirrelTemp) &&
+			DirectoryIsWritable(envSquirrelTemp) &&
+			!PathIsUNCW(envSquirrelTemp)) {
 		_swprintf_c(targetDir, _countof(targetDir), L"%s", envSquirrelTemp);
 		goto gotADir;
 	}
@@ -191,7 +192,7 @@ int CUpdateRunner::ExtractUpdaterAndRun(wchar_t* lpCommandLine, bool useFallback
 gotADir:
 
 	wcscat_s(targetDir, _countof(targetDir), L"\\SquirrelTemp");
-	
+
 	if (!CreateDirectory(targetDir, NULL) && GetLastError() != ERROR_ALREADY_EXISTS) {
 		wchar_t err[4096];
 		_swprintf_c(err, _countof(err), L"Unable to write to %s - IT policies may be restricting access to this folder", targetDir);
@@ -275,8 +276,9 @@ gotADir:
 
 	if (dwExitCode != 0) {
 		DisplayErrorMessage(CString(
-			L"There was an error while installing the application. " 
-			L"Check the setup log for more information and contact the author."), logFile);
+														L"There was an error while installing the application. "
+														L"Check the setup log for more information and contact the author."),
+												logFile);
 	}
 
 	for (unsigned int i = 0; i < to_delete.size(); i++) {
@@ -285,7 +287,7 @@ gotADir:
 
 	CloseHandle(pi.hProcess);
 	CloseHandle(pi.hThread);
-	return (int) dwExitCode;
+	return (int)dwExitCode;
 
 failedExtract:
 	if (!useFallbackDir) {
@@ -294,5 +296,5 @@ failedExtract:
 	}
 
 	DisplayErrorMessage(CString(L"Failed to extract installer"), NULL);
-	return (int) dwExitCode;
+	return (int)dwExitCode;
 }

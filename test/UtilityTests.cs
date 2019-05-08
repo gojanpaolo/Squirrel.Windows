@@ -17,7 +17,8 @@ namespace Squirrel.Tests.Core
         [Fact]
         public void SetAppIdOnShortcutTest()
         {
-            var sl = new ShellLink() {
+            var sl = new ShellLink()
+            {
                 Target = @"C:\Windows\Notepad.exe",
                 Description = "It's Notepad",
             };
@@ -62,7 +63,7 @@ namespace Squirrel.Tests.Core
 
             var emptyString = string.Empty;
             string nullString = null;
-            byte[] nullByteArray = {};
+            byte[] nullByteArray = { };
             Assert.Equal(string.Empty, Utility.RemoveByteOrderMarkerIfPresent(emptyString));
             Assert.Equal(string.Empty, Utility.RemoveByteOrderMarkerIfPresent(nullString));
             Assert.Equal(string.Empty, Utility.RemoveByteOrderMarkerIfPresent(nullByteArray));
@@ -95,12 +96,14 @@ namespace Squirrel.Tests.Core
             Assert.Equal(sha1FromExternalTool, sha1, StringComparer.OrdinalIgnoreCase);
         }
 
-        [Fact(Skip="This test takes forever")]
+        [Fact(Skip = "This test takes forever")]
         public void CanDeleteDeepRecursiveDirectoryStructure()
         {
             string tempDir;
-            using (Utility.WithTempDirectory(out tempDir)) {
-                for (var i = 0; i < 50; i++) {
+            using (Utility.WithTempDirectory(out tempDir))
+            {
+                for (var i = 0; i < 50; i++)
+                {
                     var directory = Path.Combine(tempDir, newId());
                     CreateSampleDirectory(directory);
                 }
@@ -125,7 +128,8 @@ namespace Squirrel.Tests.Core
         public void CreateFakePackageSmokeTest()
         {
             string path;
-            using (Utility.WithTempDirectory(out path)) {
+            using (Utility.WithTempDirectory(out path))
+            {
                 var output = IntegrationTestHelper.CreateFakeInstalledApp("0.3.0", path);
                 Assert.True(File.Exists(output));
             }
@@ -165,16 +169,19 @@ namespace Squirrel.Tests.Core
         static void CreateSampleDirectory(string directory)
         {
             Random prng = new Random();
-            while (true) {
+            while (true)
+            {
                 Directory.CreateDirectory(directory);
 
-                for (var j = 0; j < 100; j++) {
+                for (var j = 0; j < 100; j++)
+                {
                     var file = Path.Combine(directory, newId());
                     if (file.Length > 260) continue;
                     File.WriteAllText(file, Guid.NewGuid().ToString());
                 }
 
-                if (prng.NextDouble() > 0.5) {
+                if (prng.NextDouble() > 0.5)
+                {
                     var childDirectory = Path.Combine(directory, newId());
                     if (childDirectory.Length > 248) return;
                     directory = childDirectory;
@@ -192,11 +199,13 @@ namespace Squirrel.Tests.Core
             var provider = new SHA1Managed();
             var hashString = string.Empty;
 
-            foreach (var x in provider.ComputeHash(bytes)) {
+            foreach (var x in provider.ComputeHash(bytes))
+            {
                 hashString += String.Format("{0:x2}", x);
             }
 
-            if (hashString.Length > 7) {
+            if (hashString.Length > 7)
+            {
                 return hashString.Substring(0, 7);
             }
 
